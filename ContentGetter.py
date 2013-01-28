@@ -1,29 +1,37 @@
 #-*- coding:utf-8 -*-
 from bs4 import BeautifulSoup
 import urllib2
+import cPickle
+import re
 
 class Item:
 	pass
 
-def _getItemListFromRawContent(content):
+# @param content: raw content of html, 
+# @return resultDict{"major": itemlist} 
+def _getResultDictFromRawContent(content):
+	# Get thread counter from cPickle
+	threadFile = open("threadCounter.pkl", "r")
+	threadCounter = cPickle.load(threadFile)
 	soup = BeautifulSoup(content)
-	tbodyTagList = soup.find_all('tbody')
-	# change tag into unicode str
-	tbodyStrList = [unicode(s) for s in tbodyTagList]
-	# filter sticked post and stay uptodate and filter cs
-	CSNewPostList = [post for post in tbodyStrList if post.find('normalthread') != -1 and (post.find(u'分钟') != -1 or post.find(u'秒') != -1 or post.find(u'半小时') != -1) and post.find(u'CS') != -1]
+	# find tbodylist <tag>
+	tbodylist = soup.find(summary="forum_82").find_all(id = re.comile("normalthread"))
+	# filter the newest tbody
+	newTbodyList = [tbody for tbody in tbodylist if int(tbody["id"].split("_")[1]) > threadCounter]
 
-	itemList = list()
-	for csPost in CSNewPostList:
-		csSoup = BeautifulSoup(csPost)
-		itemLink = csSoup.find_all('a')[2]
+    resultDict = dict()
+	for tbody in newTbodyList:
+		th = tbody.find("th", "common")
+		a = th.find_all("a")[1]
 		item = Item()
-		item.title = itemLink.string
-		item.link = itemLink['href']
-		itemList.append(item)
-	return itemList
-
-
+		item.title = a.string
+		item.link = a["href"]
+		major = tbody.find(color="#F60").string
+		if(resultDict.has_key(major)):
+			resultDict[major].append(item)
+		else:
+			resultDict[major] = [item]
+	return resultDict
 
 def getContent():
 	''' Get content from report page
@@ -38,5 +46,5 @@ def getContent():
 	reader.close()
 	# unicodify content
 	unicontent = unicode(content, 'gbk')
-	itemlist = _getItemListFromRawContent(unicontent)
-	return itemlist
+	resultDict = _getResultDictFromRawContent(unicontent)
+	return resultDict
