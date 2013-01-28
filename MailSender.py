@@ -28,7 +28,7 @@ def sendMail(resultDict):
     for major, itemlist in resultDict.iteritems():
         mailStr = emailDict[major]
         if len(mailStr) == 0:
-            break
+            continue
         to_addrs = mailStr.split(' ')
         htmlLinkList = u""
         for item in itemlist:

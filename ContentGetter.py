@@ -15,14 +15,18 @@ def _getResultDictFromRawContent(content):
 	threadCounter = cPickle.load(threadFile)
 	soup = BeautifulSoup(content)
 	# find tbodylist <tag>
-	tbodylist = soup.find(summary="forum_82").find_all(id = re.comile("normalthread"))
+	tbodylist = soup.find(summary="forum_82").find_all(id = re.compile("normalthread"))
 	# filter the newest tbody
 	newTbodyList = [tbody for tbody in tbodylist if int(tbody["id"].split("_")[1]) > threadCounter]
+	latestThread = max([int(tbody["id"].split("_")[1]) for tbody in newTbodyList])
+	# Update latest thead
+	threadFile = open("threadCounter.pkl", "w")
+	cPickle.dump(latestThread, threadFile)
+	threadFile.close()
 
-    resultDict = dict()
+	resultDict = dict()
 	for tbody in newTbodyList:
-		th = tbody.find("th", "common")
-		a = th.find_all("a")[1]
+		a = tbody.find_all("a")[2]
 		item = Item()
 		item.title = a.string
 		item.link = a["href"]
