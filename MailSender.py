@@ -4,6 +4,23 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from time import sleep
 import json
+from ContentGetter import getThreadContent
+
+def _getMailContent(itemlist):
+    # Get template
+    mainFile = open("/home/rainite/public_html/static/report.html")
+    mainTemplate = unicode(mainFile.read(), 'utf-8')
+    threadFile = open("/home/rainite/public_html/static/accordiongroup.html")
+    threadTemplate = unicode(threadFile.read(), 'utf-8')
+    mainFile.close()
+    threadFile.close()
+
+    accordionStr = ""
+    for item in itemlist:
+        threadRawContent = getThreadContent(item)
+        accordion = threadTemplate % (item.link, item.title ,threadRawContent)
+        accordionStr += accordion + "<hr>"
+    return mainTemplate % accordionStr
 
 def sendMail(resultDict):
     # mail account info
@@ -30,26 +47,8 @@ def sendMail(resultDict):
         if len(mailStr) == 0:
             continue
         to_addrs = mailStr.split(' ')
-        htmlLinkList = u""
-        for item in itemlist:
-            htmlLinkList += '''
-            <a href = "%s">%s</a>
-            </br>
-            ''' % (item.link, item.title)
-
-        html = u'''
-        <html>
-            <head>
-                <title>Notification</title>
-            </head>
-            <body>
-                <h1>1point3acre Notification</h1>
-                <p>
-                %s
-                </p>
-            </body>
-        </html>
-        ''' % htmlLinkList
+        
+        html = _getMailContent(itemlist)
         mimetext = MIMEText(html.encode('utf-8'), 'html', 'utf-8')
         message.attach(mimetext)
         msgstr = message.as_string()
