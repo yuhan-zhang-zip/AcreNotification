@@ -5,12 +5,14 @@ from email.mime.text import MIMEText
 from time import sleep
 import json
 from ContentGetter import getThreadContent
+from PathResolver import getAbsoluteDir
+import os
 
 def _getMailContent(itemlist):
     # Get template
-    mainFile = open("/home/rainite/public_html/static/report.html")
+    mainFile = open(os.path.join(getAbsoluteDir(), "report.html"), 'r')
     mainTemplate = unicode(mainFile.read(), 'utf-8')
-    threadFile = open("/home/rainite/public_html/static/accordiongroup.html")
+    threadFile = open(os.path.join(getAbsoluteDir(), "accordiongroup.html"), 'r')
     threadTemplate = unicode(threadFile.read(), 'utf-8')
     mainFile.close()
     threadFile.close()
@@ -38,7 +40,7 @@ def sendMail(resultDict):
     message['From'] = from_addr
 
     # get maillist
-    mailFile = open("emailList.json", 'r')
+    mailFile = open(os.path.join(getAbsoluteDir(), "emailList.json"), 'r')
     emailDict = json.loads(mailFile.read())
     mailFile.close()
 

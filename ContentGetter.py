@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import urllib2
 import cPickle
 import re
+from PathResolver import getAbsoluteDir
+import os
 
 class Item:
 	pass
@@ -14,8 +16,10 @@ def _getResultDictFromRawContent(content):
 	@param content: raw content of html, 
     @return resultDict{"major": itemlist} 
     '''
+	absoluteDir = getAbsoluteDir()
 	# Get thread counter from cPickle
-	threadFile = open("threadCounter.pkl", "r")
+	tfilePath = os.path.join(absoluteDir, "threadCounter.pkl")
+	threadFile = open(tfilePath, "r")
 	threadCounter = cPickle.load(threadFile)
 	soup = BeautifulSoup(content)
 	# find tbodylist <tag>
@@ -28,7 +32,7 @@ def _getResultDictFromRawContent(content):
 		return None
 	latestThread = max(threadnumberList)
 	# Update latest thead
-	threadFile = open("threadCounter.pkl", "w")
+	threadFile = open(tfilePath, "w")
 	cPickle.dump(latestThread, threadFile)
 	threadFile.close()
 
