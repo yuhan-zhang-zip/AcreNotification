@@ -26,8 +26,8 @@ def _getMailContent(itemlist):
 
 def sendMail(resultDict):
     # mail account info
-    mail_username='njuprincerain@gmail.com'
-    mail_password='NJUprince'
+    mail_username='<gmail address>' # e.g. njuprincerain@gmail.com
+    mail_password='<password>' #gmail password
     from_addr = 'njuprincerain@gmail.com'
     to_addrs= []
 
