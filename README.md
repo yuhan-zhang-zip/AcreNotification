@@ -19,3 +19,7 @@ It parse html retrieved from web page and embed the valid info into mail.(Use co
 * Use a template engine to form html in email
 * Support multi-selection of major
 * User authentation
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/njuprincerain/acrenotification/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
